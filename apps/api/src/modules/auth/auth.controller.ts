@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Res, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Res, HttpCode, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SendOtpDto, VerifyOtpDto, AdminLoginDto } from './dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -59,6 +61,34 @@ export class AuthController {
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
     return { success: true, data: { message: 'Logged out' } };
+  }
+
+  @Post('email/send-verification')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Send email verification code' })
+  async sendEmailVerification(@CurrentUser('userId') userId: string) {
+    const result = await this.authService.sendEmailVerification(userId);
+    return { success: true, data: result };
+  }
+
+  @Post('email/verify')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Verify email with code' })
+  async verifyEmail(@CurrentUser('userId') userId: string, @Body() body: { code: string }) {
+    await this.authService.verifyEmail(userId, body.code);
+    return { success: true, data: { message: 'Email verified' } };
+  }
+
+  @Get('email/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Check email verification status' })
+  async emailStatus(@CurrentUser('userId') userId: string) {
+    const status = await this.authService.getEmailVerificationStatus(userId);
+    return { success: true, data: status };
   }
 
   private setTokenCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {

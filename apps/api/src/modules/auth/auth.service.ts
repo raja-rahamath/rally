@@ -143,6 +143,60 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async sendEmailVerification(customerId: string) {
+    const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+    if (!customer || !customer.email) {
+      throw new UnauthorizedException('No email address on file');
+    }
+
+    if (customer.emailVerified) {
+      return { message: 'Email already verified' };
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await this.prisma.customer.update({
+      where: { id: customerId },
+      data: { emailVerifyCode: code, emailVerifyExpiry: expiry },
+    });
+
+    // TODO: Send actual email via SendGrid/provider
+    console.log(`[DEV] Email verification code for ${customer.email}: ${code}`);
+
+    const isDev = this.config.get('NODE_ENV') !== 'production';
+    return { message: 'Verification email sent', ...(isDev && { devCode: code }) };
+  }
+
+  async verifyEmail(customerId: string, code: string) {
+    const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+    if (!customer) throw new UnauthorizedException('Customer not found');
+
+    if (customer.emailVerified) return;
+
+    if (
+      !customer.emailVerifyCode ||
+      customer.emailVerifyCode !== code ||
+      !customer.emailVerifyExpiry ||
+      customer.emailVerifyExpiry < new Date()
+    ) {
+      throw new UnauthorizedException('Invalid or expired verification code');
+    }
+
+    await this.prisma.customer.update({
+      where: { id: customerId },
+      data: { emailVerified: true, emailVerifyCode: null, emailVerifyExpiry: null },
+    });
+  }
+
+  async getEmailVerificationStatus(customerId: string) {
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+      select: { emailVerified: true, email: true },
+    });
+    return { emailVerified: customer?.emailVerified || false, email: customer?.email };
+  }
+
   private async getTenantForUser(userId: string, role: string): Promise<string> {
     if (role === 'customer') {
       const customer = await this.prisma.customer.findUnique({ where: { id: userId } });

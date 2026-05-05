@@ -40,5 +40,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: data.message || 'Failed to update profile' }, { status: res.status });
   }
 
+  // Auto-send verification email after profile completion
+  if (body.email) {
+    await fetch(`${API_URL}/auth/email/send-verification`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
   return NextResponse.json({ success: true, customer: data.data });
 }
