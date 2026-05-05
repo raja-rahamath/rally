@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Rally",
+    "slug": "rally-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "rally",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.rsquare.rally",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.rsquare.rally",
+      "adaptiveIcon": {
+        "backgroundColor": "#3B82F6"
+      }
+    },
+    "plugins": ["expo-router"]
+  }
+}

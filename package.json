@@ -1,0 +1,28 @@
+{
+  "name": "rally",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rally - Customer Engagement Platform",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev -w @rally/api",
+    "dev:admin": "npm run dev -w @rally/admin",
+    "dev:customer": "npm run dev -w @rally/customer",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run db:generate -w @rally/api",
+    "db:migrate": "npm run db:migrate -w @rally/api",
+    "db:seed": "npm run db:seed -w @rally/api",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
