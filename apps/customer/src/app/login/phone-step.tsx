@@ -16,7 +16,7 @@ interface Props {
   countryCode: string;
   onPhoneChange: (v: string) => void;
   onCountryCodeChange: (v: string) => void;
-  onSuccess: () => void;
+  onSuccess: (devOtp?: string) => void;
 }
 
 export function PhoneStep({ phone, countryCode, onPhoneChange, onCountryCodeChange, onSuccess }: Props) {
@@ -42,7 +42,7 @@ export function PhoneStep({ phone, countryCode, onPhoneChange, onCountryCodeChan
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
-      onSuccess();
+      onSuccess(data.devOtp);
     } catch (err: any) {
       setError(err.message);
     } finally {

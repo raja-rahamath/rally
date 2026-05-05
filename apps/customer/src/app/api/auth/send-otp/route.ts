@@ -17,5 +17,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: data.message || 'Failed to send OTP' }, { status: res.status });
   }
 
-  return NextResponse.json({ success: true, message: 'OTP sent' });
+  return NextResponse.json({ success: true, message: 'OTP sent', ...(data.data?.otp && { devOtp: data.data.otp }) });
 }

@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+973');
+  const [devOtp, setDevOtp] = useState('');
 
   return (
     <div className="min-h-screen flex flex-col justify-center px-6 py-12 max-w-md mx-auto">
@@ -26,12 +27,13 @@ export default function LoginPage() {
           countryCode={countryCode}
           onPhoneChange={setPhone}
           onCountryCodeChange={setCountryCode}
-          onSuccess={() => setStep('otp')}
+          onSuccess={(otp) => { setDevOtp(otp || ''); setStep('otp'); }}
         />
       ) : (
         <OtpStep
           phone={phone}
           countryCode={countryCode}
+          devOtp={devOtp}
           onBack={() => setStep('phone')}
         />
       )}

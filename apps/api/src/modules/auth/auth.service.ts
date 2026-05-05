@@ -24,10 +24,14 @@ export class AuthService {
     });
 
     // TODO: Send SMS via configured provider
-    // For development, log the OTP
+    // For development, log the OTP and include in response
     console.log(`[DEV] OTP for ${countryCode}${phone}: ${otp}`);
 
-    return { message: 'OTP sent successfully' };
+    const isDev = this.config.get('NODE_ENV') !== 'production';
+    return {
+      message: 'OTP sent successfully',
+      ...(isDev && { otp }),
+    };
   }
 
   async verifyOtp(phone: string, countryCode: string, code: string, tenantId: string) {

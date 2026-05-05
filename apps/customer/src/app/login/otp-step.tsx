@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 interface Props {
   phone: string;
   countryCode: string;
+  devOtp?: string;
   onBack: () => void;
 }
 
-export function OtpStep({ phone, countryCode, onBack }: Props) {
+export function OtpStep({ phone, countryCode, devOtp, onBack }: Props) {
   const router = useRouter();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -149,8 +150,15 @@ export function OtpStep({ phone, countryCode, onBack }: Props) {
         )}
       </div>
 
+      {devOtp && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center">
+          <p className="text-xs text-amber-600 font-medium">DEV MODE</p>
+          <p className="text-lg font-mono font-bold text-amber-800 tracking-widest">{devOtp}</p>
+        </div>
+      )}
+
       <p className="text-xs text-gray-400 text-center">
-        Check your console for the OTP (dev mode)
+        {devOtp ? 'Use the code above (dev only)' : 'Check your console for the OTP (dev mode)'}
       </p>
     </div>
   );
