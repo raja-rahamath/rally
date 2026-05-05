@@ -38,6 +38,7 @@ async function main() {
     timezone: 'Asia/Bahrain',
     pointsPerUnit: '30',
     pointValue: '0.0007',
+    dateFormat: 'dd/MM/yyyy',
   };
   for (const [key, value] of Object.entries(settings)) {
     await prisma.tenantSetting.upsert({
@@ -126,7 +127,7 @@ async function main() {
       language: 'ar',
       pointsBalance: 5000,
       tierLevel: 'driver',
-      qrCode: uuid(),
+      qrCode: '20250001',
     },
   });
 

@@ -53,12 +53,12 @@ export default function CustomerDashboard() {
     : 'Welcome!';
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6">
+    <div className="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-sm text-gray-500">Hello,</p>
-          <h1 className="text-xl font-bold text-gray-900">{displayName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">{displayName}</h1>
         </div>
         <button
           onClick={() => router.push('/profile')}
@@ -71,10 +71,10 @@ export default function CustomerDashboard() {
       </div>
 
       {/* Points Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white mb-6 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 md:p-8 text-white mb-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8" />
         <p className="text-sm opacity-80">Points Balance</p>
-        <p className="text-4xl font-bold mt-1">{customer.pointsBalance.toLocaleString()}</p>
+        <p className="text-4xl md:text-5xl font-bold mt-1">{customer.pointsBalance.toLocaleString()}</p>
         <div className="flex items-center justify-between mt-4">
           <div>
             <p className="text-xs opacity-60">Tier</p>
@@ -82,13 +82,13 @@ export default function CustomerDashboard() {
           </div>
           <div className="text-right">
             <p className="text-xs opacity-60">Member ID</p>
-            <p className="text-sm font-mono">{customer.qrCode.slice(0, 8)}</p>
+            <p className="text-sm font-mono">{customer.qrCode}</p>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-3 md:gap-4 mb-6">
         <QuickAction icon="📄" label="Receipt" href="/upload" />
         <QuickAction icon="🚗" label="Vehicles" href="/vehicles" />
         <QuickAction icon="📊" label="History" href="/history" />
@@ -96,7 +96,7 @@ export default function CustomerDashboard() {
       </div>
 
       {/* Recent Activity placeholder */}
-      <div className="bg-gray-50 rounded-xl p-4">
+      <div className="bg-gray-50 rounded-xl p-4 md:p-6">
         <h2 className="text-sm font-semibold text-gray-700 mb-3">Recent Activity</h2>
         <p className="text-sm text-gray-400 text-center py-4">
           No recent activity. Upload a receipt to earn points!
@@ -119,9 +119,9 @@ export default function CustomerDashboard() {
 
 function QuickAction({ icon, label, href }: { icon: string; label: string; href: string }) {
   return (
-    <a href={href} className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-gray-50 transition">
-      <span className="text-2xl">{icon}</span>
-      <span className="text-xs text-gray-600">{label}</span>
+    <a href={href} className="flex flex-col items-center gap-1 p-3 md:p-4 rounded-xl hover:bg-gray-50 transition">
+      <span className="text-2xl md:text-3xl">{icon}</span>
+      <span className="text-xs md:text-sm text-gray-600">{label}</span>
     </a>
   );
 }

@@ -53,4 +53,21 @@ export class TenantController {
     const tenant = await this.tenantService.update(id, body);
     return { success: true, data: tenant };
   }
+
+  @Get(':id/settings')
+  @ApiOperation({ summary: 'Get tenant settings' })
+  async getSettings(@Param('id') id: string) {
+    const settings = await this.tenantService.getSettings(id);
+    return { success: true, data: settings };
+  }
+
+  @Patch(':id/settings')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'tenant_admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a tenant setting' })
+  async updateSetting(@Param('id') id: string, @Body() body: { key: string; value: string }) {
+    const setting = await this.tenantService.updateSetting(id, body.key, body.value);
+    return { success: true, data: setting };
+  }
 }

@@ -64,6 +64,7 @@ export class AuthService {
     });
 
     if (!customer) {
+      const memberId = await this.generateUniqueMemberId();
       customer = await this.prisma.customer.create({
         data: {
           tenantId,
@@ -71,13 +72,23 @@ export class AuthService {
           countryCode,
           firstName: '',
           lastName: '',
-          qrCode: uuid(),
+          qrCode: memberId,
         },
       });
     }
 
     const tokens = await this.generateTokens(customer.id, tenantId, 'customer');
     return { tokens, customer, isNewCustomer: !customer.firstName };
+  }
+
+  private async generateUniqueMemberId(): Promise<string> {
+    for (let i = 0; i < 10; i++) {
+      const id = String(10000000 + Math.floor(Math.random() * 90000000));
+      const existing = await this.prisma.customer.findFirst({ where: { qrCode: id } });
+      if (!existing) return id;
+    }
+    // Fallback: timestamp-based
+    return String(Date.now()).slice(-8);
   }
 
   async adminLogin(email: string, password: string, tenantId: string) {

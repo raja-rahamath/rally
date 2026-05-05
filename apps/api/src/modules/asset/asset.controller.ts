@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AssetService } from './asset.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -43,6 +43,18 @@ export class AssetController {
     @Body() body: any,
   ) {
     const asset = await this.assetService.createAsset(tenantId, userId, body);
+    return { success: true, data: asset };
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update an asset' })
+  async updateAsset(
+    @Param('id') id: string,
+    @CurrentUser('userId') userId: string,
+    @CurrentUser('tenantId') tenantId: string,
+    @Body() body: any,
+  ) {
+    const asset = await this.assetService.updateAsset(id, tenantId, userId, body);
     return { success: true, data: asset };
   }
 

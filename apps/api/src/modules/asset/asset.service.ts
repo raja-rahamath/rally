@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -28,7 +28,24 @@ export class AssetService {
 
   async getCustomerAssets(customerId: string, tenantId: string) {
     return this.prisma.asset.findMany({
-      where: { customerId, tenantId, status: 'ACTIVE' },
+      where: { customerId, tenantId },
+      include: { assetType: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async updateAsset(id: string, tenantId: string, customerId: string, data: { name?: string; fields?: any; status?: string }) {
+    const asset = await this.prisma.asset.findFirst({ where: { id, tenantId } });
+    if (!asset) throw new NotFoundException('Asset not found');
+    if (asset.customerId !== customerId) throw new ForbiddenException('Not your asset');
+
+    return this.prisma.asset.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.fields && { fields: data.fields }),
+        ...(data.status && { status: data.status as any }),
+      },
       include: { assetType: true },
     });
   }
