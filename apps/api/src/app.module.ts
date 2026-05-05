@@ -9,6 +9,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { PointsModule } from './modules/points/points.module';
 import { AssetModule } from './modules/asset/asset.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { HealthModule } from './modules/health/health.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { HealthModule } from './modules/health/health.module';
     PointsModule,
     AssetModule,
     TransactionModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

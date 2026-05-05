@@ -16,13 +16,37 @@ interface DashboardStats {
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [pendingTx, setPendingTx] = useState<any[]>([]);
+
   useEffect(() => {
-    // TODO: Fetch real stats from API
-    setStats({
-      customers: { total: 1, active: 1, newThisMonth: 1 },
-      transactions: { pending: 0, todayCount: 0, todayAmount: 0 },
-      points: { totalIssued: 5000, totalRedeemed: 0 },
-    });
+    async function fetchData() {
+      try {
+        const [dashRes, customersRes, txRes] = await Promise.all([
+          fetch('/api/proxy/dashboard/stats'),
+          fetch('/api/proxy/customers?limit=5'),
+          fetch('/api/proxy/transactions/pending?limit=5'),
+        ]);
+        const dashData = await dashRes.json();
+        const customersData = await customersRes.json();
+        const txData = await txRes.json();
+
+        if (dashData.data) {
+          setStats(dashData.data);
+        } else {
+          setStats({
+            customers: { total: 0, active: 0, newThisMonth: 0 },
+            transactions: { pending: 0, todayCount: 0, todayAmount: 0 },
+            points: { totalIssued: 0, totalRedeemed: 0 },
+          });
+        }
+        setCustomers(customersData.data || []);
+        setPendingTx(txData.data || []);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+      }
+    }
+    fetchData();
   }, []);
 
   return (
@@ -65,12 +89,23 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Recent Customers</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <CustomerRow name="Ahmed Al Khalifa" phone="+973 33001234" points={5000} tier="Driver" />
-              </div>
-              <p className="text-sm text-muted-foreground mt-4 text-center">
-                More customers will appear as they register
-              </p>
+              {customers.length > 0 ? (
+                <div className="space-y-3">
+                  {customers.map((c: any) => (
+                    <CustomerRow
+                      key={c.id}
+                      name={`${c.firstName} ${c.lastName}`}
+                      phone={`${c.countryCode} ${c.phone}`}
+                      points={c.pointsBalance}
+                      tier={c.tierLevel}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No customers yet
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -79,9 +114,29 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Pending Transactions</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No pending transactions
-              </p>
+              {pendingTx.length > 0 ? (
+                <div className="space-y-3">
+                  {pendingTx.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between py-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {tx.customer ? `${tx.customer.firstName} ${tx.customer.lastName}` : 'Unknown'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {tx.invoiceNumber || 'No invoice #'}
+                        </p>
+                      </div>
+                      <p className="text-sm font-medium">
+                        {parseFloat(tx.amount).toFixed(3)} {tx.currency}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No pending transactions
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
